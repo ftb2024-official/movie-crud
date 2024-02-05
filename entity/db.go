@@ -1,3 +1,5 @@
+package entity
+
 type Director struct {
 	FirstName string `json:"fname"`
 	LastName  string `json:"lname"`

@@ -9,16 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	movie "github.com/ftb2024-official/movie-crud/entity"
 	middleware "github.com/ftb2024-official/movie-crud/middlewares"
 )
 
-var movies []Movie
+var movies []movie.Movie
 
-func getMovies(db *[]Movie) gin.HandlerFunc {
+func getMovies(db *[]movie.Movie) gin.HandlerFunc {
 	return func(ctx *gin.Context) { ctx.JSON(200, gin.H{"data": db}) }
 }
 
-func getMovie(db *[]Movie) gin.HandlerFunc {
+func getMovie(db *[]movie.Movie) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		found := false
@@ -36,7 +37,7 @@ func getMovie(db *[]Movie) gin.HandlerFunc {
 	}
 }
 
-func deleteMovie(db *[]Movie) gin.HandlerFunc {
+func deleteMovie(db *[]movie.Movie) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		id := ctx.Param("id")
 		idxToDelete := -1
@@ -55,9 +56,9 @@ func deleteMovie(db *[]Movie) gin.HandlerFunc {
 	}
 }
 
-func createMovie(db *[]Movie) gin.HandlerFunc {
+func createMovie(db *[]movie.Movie) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var newMovie Movie
+		var newMovie movie.Movie
 
 		input, err := io.ReadAll(ctx.Request.Body)
 		if err != nil {
@@ -77,9 +78,9 @@ func createMovie(db *[]Movie) gin.HandlerFunc {
 	}
 }
 
-func editMovie(db *[]Movie) gin.HandlerFunc {
+func editMovie(db *[]movie.Movie) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var editedMovie, oldMovie Movie
+		var editedMovie, oldMovie movie.Movie
 		found := false
 
 		id := ctx.Param("id")
@@ -141,7 +142,7 @@ func editMovie(db *[]Movie) gin.HandlerFunc {
 }
 
 func main() {
-	movies = append(movies, Movie{Id: uuid.NewString(), Isbn: "227125917-7", Title: "Titanic", Year: 1999, Director: Director{FirstName: "John", LastName: "Doe"}})
+	movies = append(movies, movie.Movie{Id: uuid.NewString(), Isbn: "227125917-7", Title: "Titanic", Year: 1999, Director: movie.Director{FirstName: "John", LastName: "Doe"}})
 	router := gin.Default()
 
 	router.GET("/api/movies", getMovies(&movies))
