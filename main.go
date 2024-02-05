@@ -8,6 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+
+	middleware "github.com/ftb2024-official/movie-crud/middlewares"
 )
 
 type Director struct {
@@ -156,10 +158,10 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/api/movies", getMovies(&movies))
-	router.GET("/api/movies/:id", getMovie(&movies))
+	router.Use(middleware.CheckGetUUID).GET("/api/movies/:id", getMovie(&movies))
 	router.POST("/api/movies", createMovie(&movies))
-	router.PATCH("/api/movies/:id", editMovie(&movies))
-	router.DELETE("/api/movies/:id", deleteMovie(&movies))
+	router.Use(middleware.CheckEditUUID).PATCH("/api/movies/:id", editMovie(&movies))
+	router.Use(middleware.ChecDelUUID).DELETE("/api/movies/:id", deleteMovie(&movies))
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatalf("Unable to run the server at port 8080 :(")

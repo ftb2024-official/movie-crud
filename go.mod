@@ -1,4 +1,4 @@
-module movie_crud
+module github.com/ftb2024-official/movie-crud
 
 go 1.21.3
 
