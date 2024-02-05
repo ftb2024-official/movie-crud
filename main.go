@@ -16,11 +16,11 @@ type Director struct {
 }
 
 type Movie struct {
-	Id       string    `json:"id"`
-	Isbn     string    `json:"isbn"`
-	Title    string    `json:"title"`
-	Year     int       `json:"year"`
-	Director *Director `json:"director"`
+	Id       string   `json:"id,omitempty"`
+	Isbn     string   `json:"isbn"`
+	Title    string   `json:"title"`
+	Year     int      `json:"year"`
+	Director Director `json:"director"`
 }
 
 var movies []Movie
@@ -55,7 +55,7 @@ func deleteMovie(db *[]Movie) gin.HandlerFunc {
 		for idx, movie := range *db {
 			if movie.Id == id {
 				*db = append((*db)[:idx], (*db)[idx+1:]...)
-				ctx.JSON(200, gin.H{"message": fmt.Sprintf("User with id = %v successfully deleted", id)})
+				ctx.JSON(200, gin.H{"message": fmt.Sprintf("Movie with id = %v successfully deleted", id)})
 				return
 			}
 		}
@@ -89,11 +89,70 @@ func createMovie(db *[]Movie) gin.HandlerFunc {
 }
 
 func editMovie(db *[]Movie) gin.HandlerFunc {
-	return func(ctx *gin.Context) {}
+	return func(ctx *gin.Context) {
+		var editedMovie, oldMovie Movie
+		found := false
+
+		id := ctx.Param("id")
+
+		for _, movie := range *db {
+			if movie.Id == id {
+				found = true
+				oldMovie = movie
+				break
+			}
+		}
+
+		if !found {
+			ctx.JSON(404, gin.H{"Not Found": fmt.Sprintf("Movie with id = %v not found", id)})
+			return
+		}
+
+		input, err := io.ReadAll(ctx.Request.Body)
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "Unable to read request body"})
+			return
+		}
+
+		err = json.Unmarshal(input, &editedMovie)
+		if err != nil {
+			ctx.JSON(400, gin.H{"error": "Unable to marshall JSON request body"})
+			return
+		}
+
+		if editedMovie.Isbn != "" {
+			oldMovie.Isbn = editedMovie.Isbn
+		}
+
+		if editedMovie.Title != "" {
+			oldMovie.Title = editedMovie.Title
+		}
+
+		if editedMovie.Year != 0 {
+			oldMovie.Year = editedMovie.Year
+		}
+
+		if editedMovie.Isbn != "" {
+			oldMovie.Isbn = editedMovie.Isbn
+		}
+
+		if editedMovie.Director.FirstName != "" {
+			oldMovie.Director.FirstName = editedMovie.Director.FirstName
+		}
+
+		if editedMovie.Director.LastName != "" {
+			oldMovie.Director.LastName = editedMovie.Director.LastName
+		}
+
+		ctx.JSON(201, gin.H{
+			"message": fmt.Sprintf("Movie with id = %v successfully edited", id),
+			"data":    oldMovie,
+		})
+	}
 }
 
 func main() {
-	movies = append(movies, Movie{Id: uuid.NewString(), Isbn: "227125917-7", Title: "Titanic", Year: 1999, Director: &Director{FirstName: "John", LastName: "Doe"}})
+	movies = append(movies, Movie{Id: uuid.NewString(), Isbn: "227125917-7", Title: "Titanic", Year: 1999, Director: Director{FirstName: "John", LastName: "Doe"}})
 	router := gin.Default()
 
 	router.GET("/api/movies", getMovies(&movies))
