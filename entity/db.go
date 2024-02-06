@@ -7,7 +7,7 @@ type Director struct {
 
 type Movie struct {
 	Id       string   `json:"id,omitempty"`
-	Isbn     string   `json:"isbn"`
+	Isbn     string   `json:"isbn,omitempty"`
 	Title    string   `json:"title"`
 	Year     int      `json:"year"`
 	Director Director `json:"director"`

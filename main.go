@@ -142,12 +142,12 @@ func editMovie(db *[]movie.Movie) gin.HandlerFunc {
 }
 
 func main() {
-	movies = append(movies, movie.Movie{Id: uuid.NewString(), Isbn: "227125917-7", Title: "Titanic", Year: 1999, Director: movie.Director{FirstName: "John", LastName: "Doe"}})
+	movies = append(movies, movie.Movie{Id: uuid.NewString(), Isbn: uuid.NewString(), Title: "Titanic", Year: 1999, Director: movie.Director{FirstName: "John", LastName: "Doe"}})
 	router := gin.Default()
 
 	router.GET("/api/movies", getMovies(&movies))
+	router.Use(middleware.CheckReqJSON).POST("/api/movies", createMovie(&movies))
 	router.Use(middleware.CheckGetUUID).GET("/api/movies/:id", getMovie(&movies))
-	router.POST("/api/movies", createMovie(&movies))
 	router.Use(middleware.CheckEditUUID).PATCH("/api/movies/:id", editMovie(&movies))
 	router.Use(middleware.ChecDelUUID).DELETE("/api/movies/:id", deleteMovie(&movies))
 
